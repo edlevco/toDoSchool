@@ -7,7 +7,7 @@ class List:
 
     def __init__ (self, list_name):
         self.list_name = list_name
-        self.list_file = list_name+".json"
+        self.list_file = "lists/"+list_name+".json"
         self.initialize_list()
 
     def initialize_list (self):
@@ -51,29 +51,39 @@ class List:
         # Mapping of status to messages and colors
         status_map = {
             1: ("un-started", "red"),
-            0: ("inprogress", "yellow")
+            2: ("inprogress", "yellow")
         }
 
-        for i, task in enumerate(data["task"]):
-            print(f"{i+1}) {names[i]}\n")
-            print(f"{task["description"]}")
-            # Get the status from the task
-            task_status = task.get("status", 0)  # Default to 0 if "status" is not found
-
-            # Use the mapping to print the corresponding message
+                # Iterate through the tasks
+        for key, task in data["tasks"].items():
+            print(f"Task: {key}")
+            print(f"Description: {task['description']}")
+            
+            # Get the status
+            task_status = task.get("status", 0)  # Default to 0 if "status" is missing
             message, color = status_map.get(task_status, ("unknown", "white"))
             print(colored(message, color))
 
 
     def print_all_names(self):
         data = self.load_list()
-        for name, i in data["tasks"]["name"]:
-            print(f"{i}) {name}")
+        for i, name in enumerate(data["tasks"].keys()):
+            print(f"{i+1}) {name}")
+        
+        return i+1
             
 
 
-    def remove_item(self, name):
-        pass
+    def remove_item(self, index):
+        data = self.load_list()
+        all_items = list(data["tasks"].keys())
+
+        key_to_remove = all_items[index-1]
+        
+        del data["tasks"][key_to_remove]  # Remove the key-value pair
+
+        self.save_list(data)
+
 
 
 
@@ -106,6 +116,17 @@ def getValidInt(prompt, min, max):
             except ValueError:
                 print("Invalid Integer: Try again: ")
 
+def createNewList():
+    json_files = [file for file in os.listdir("lists") if file.endswith('.json')]
+    while True:
+        list_name = (input("Enter the name of the new list: ")).lower()
+
+        for file in json_files:
+            if list_name == file.split('.')[0]:
+                print(f"There is already a list with the name: {list_name}")
+                return None
+        
+        return list_name
 
                 
 
