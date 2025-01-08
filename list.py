@@ -1,6 +1,7 @@
 import os
 import json
 from datetime import datetime
+from termcolor import colored
 
 class List:
 
@@ -19,7 +20,7 @@ class List:
         
         name = input("Enter task name: ")
         description = input("Enter task description: ")
-        status = self.getValidInt("""
+        status = getValidInt("""
                                 (1) Not Started
                                 (2) In Progress
 
@@ -32,7 +33,6 @@ class List:
             "status": status,
             "date": date,
         }
-
         self.save_list(data)
 
     def load_list(self):
@@ -45,7 +45,24 @@ class List:
     
     def print_list(self):
         data = self.load_list()
+        names = list(data["tasks"].keys())
         print(f"List name: {self.list_name}")
+
+        # Mapping of status to messages and colors
+        status_map = {
+            1: ("un-started", "red"),
+            0: ("inprogress", "yellow")
+        }
+
+        for i, task in enumerate(data["task"]):
+            print(f"{i+1}) {names[i]}\n")
+            print(f"{task["description"]}")
+            # Get the status from the task
+            task_status = task.get("status", 0)  # Default to 0 if "status" is not found
+
+            # Use the mapping to print the corresponding message
+            message, color = status_map.get(task_status, ("unknown", "white"))
+            print(colored(message, color))
 
 
     def print_all_names(self):
@@ -59,18 +76,6 @@ class List:
         pass
 
 
-    def getValidInt(self, prompt, min, max):
-        while True:
-            try:
-                num = int(input(prompt))
-
-                if num <= max and num >= min:
-                    return num
-                else:
-                    print("Integer out of range: Try again: ")
-
-            except ValueError:
-                print("Invalid Integer: Try again: ")
 
     def getValidDate(self, prompt, date_format="%Y-%m-%d"):
         while True:
@@ -88,6 +93,18 @@ class List:
             except ValueError:
                 print(f"Invalid date. Please enter in the format: {date_format}")
 
+def getValidInt(prompt, min, max):
+        while True:
+            try:
+                num = int(input(prompt))
+
+                if num <= max and num >= min:
+                    return num
+                else:
+                    print("Integer out of range: Try again: ")
+
+            except ValueError:
+                print("Invalid Integer: Try again: ")
 
 
                 
