@@ -67,10 +67,10 @@ class List:
 
     def print_all_names(self):
         data = self.load_list()
-        for i, name in enumerate(data["tasks"].keys()):
-            print(f"{i+1}) {name}")
+        for i, name in enumerate(data["tasks"].keys(), start = 1):
+            print(f"{i}) {name}")
         
-        return i+1
+        return i
             
 
 
@@ -79,9 +79,7 @@ class List:
         all_items = list(data["tasks"].keys())
 
         key_to_remove = all_items[index-1]
-        
         del data["tasks"][key_to_remove]  # Remove the key-value pair
-
         self.save_list(data)
 
 
@@ -127,6 +125,19 @@ def createNewList():
                 return None
         
         return list_name
+    
+def printAllListNames():
+    json_files = [file.split(".")[0] for file in os.listdir("lists") if file.endswith('.json')]
+
+    for index, file in enumerate(json_files, start=1):
+        print(f"{index}) {file}")
+    
+    return index
+
+def getListName(index):
+    json_files = [file.split(".")[0] for file in os.listdir("lists") if file.endswith('.json')]
+    return json_files[index-1]
+
 
                 
 
