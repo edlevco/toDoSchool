@@ -5,15 +5,17 @@ from termcolor import colored
 
 class List:
 
+    
+
     def __init__ (self, list_name):
+        self.file_name = "all_lists.json"
         self.list_name = list_name
-        self.list_file = "lists/"+list_name+".json"
         self.initialize_list()
 
     def initialize_list (self):
-        if not os.path.exists(self.list_file):
-            with open(self.list_file, "w") as f:
-                json.dump({"tasks": {}}, f, indent = 4)
+        if not os.path.exists(self.file_name):
+            with open(self.file_name, "w") as f:
+                json.dump({"lists": {}}, f, indent = 4)
 
     def add_task(self):
         data = self.load_list()
@@ -28,7 +30,7 @@ class List:
 
         date = self.getValidDate("Enter tasks due date (yyyy-mm-dd): ")
     
-        data["tasks"][name] = {
+        data["tasks"][self.list_name][name] = {
             "description": description,
             "status": status,
             "date": date,
@@ -36,16 +38,16 @@ class List:
         self.save_list(data)
 
     def load_list(self):
-        with open(self.list_file, "r") as f:
+        with open(self.file_name, "r") as f:
             return json.load(f)
     
     def save_list(self, data):
-        with open(self.list_file, "w") as f:
+        with open(self.file_name, "w") as f:
                 json.dump(data, f, indent = 4)
     
-    def print_list(self):
+    def print_tasks(self):
         data = self.load_list()
-        names = list(data["tasks"].keys())
+        names = list(data["lists"][self.list_name].keys())
         print(f"List name: {self.list_name}")
 
         # Mapping of status to messages and colors
@@ -67,12 +69,11 @@ class List:
 
     def print_all_names(self):
         data = self.load_list()
-        for i, name in enumerate(data["tasks"].keys(), start = 1):
+        for i, name in enumerate(data["tasks"][self.list_name].keys(), start = 1):
             print(f"{i}) {name}")
         
         return i
             
-
 
     def remove_item(self, index):
         data = self.load_list()
@@ -127,7 +128,7 @@ def createNewList():
         return list_name
     
 def printAllListNames():
-    json_files = [file.split(".")[0] for file in os.listdir("lists") if file.endswith('.json')]
+
 
     for index, file in enumerate(json_files, start=1):
         print(f"{index}) {file}")
