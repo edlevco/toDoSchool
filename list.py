@@ -5,8 +5,6 @@ from termcolor import colored
 
 class List:
 
-    
-
     def __init__ (self, list_name):
         self.file_name = "all_lists.json"
         self.list_name = list_name
@@ -16,6 +14,15 @@ class List:
         if not os.path.exists(self.file_name):
             with open(self.file_name, "w") as f:
                 json.dump({"lists": {}}, f, indent = 4)
+
+    def make_key(self):
+        data = self.load_list()
+
+        data["lists"][self.list_name] = {
+            
+        }
+
+        self.save_list(data)
 
     def add_task(self):
         data = self.load_list()
@@ -102,6 +109,25 @@ class List:
             except ValueError:
                 print(f"Invalid date. Please enter in the format: {date_format}")
 
+    def createNewList(self):
+        data = self.load_list()
+        while True:
+            list_name = (input("Enter the name of the new list: ")).lower()
+
+            for name in data["lists"].keys():
+                if list_name == name:
+                    print(f"There is already a list with the name: {list_name}")
+                    return None
+            
+            return list_name
+    
+    
+    
+
+    def getListName(index):
+        json_files = [file.split(".")[0] for file in os.listdir("lists") if file.endswith('.json')]
+        return json_files[index-1]
+
 def getValidInt(prompt, min, max):
         while True:
             try:
@@ -115,29 +141,13 @@ def getValidInt(prompt, min, max):
             except ValueError:
                 print("Invalid Integer: Try again: ")
 
-def createNewList():
-    json_files = [file for file in os.listdir("lists") if file.endswith('.json')]
-    while True:
-        list_name = (input("Enter the name of the new list: ")).lower()
-
-        for file in json_files:
-            if list_name == file.split('.')[0]:
-                print(f"There is already a list with the name: {list_name}")
-                return None
+def returnAllLists():
+        with open("all_lists.json", "r") as f:
+            data = json.load(f)
+            return list(data["lists"].keys())
         
-        return list_name
-    
-def printAllListNames():
 
 
-    for index, file in enumerate(json_files, start=1):
-        print(f"{index}) {file}")
-    
-    return index
-
-def getListName(index):
-    json_files = [file.split(".")[0] for file in os.listdir("lists") if file.endswith('.json')]
-    return json_files[index-1]
 
 
                 
