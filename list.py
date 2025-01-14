@@ -5,10 +5,12 @@ from termcolor import colored
 
 class List:
 
-    def __init__ (self, list_name):
+    def __init__ (self, list_name, color):
         self.file_name = "all_lists.json"
         self.list_name = list_name
+        self.color = color
         self.initialize_list()
+        self.make_key()
 
     def initialize_list (self):
         if not os.path.exists(self.file_name):
@@ -17,11 +19,8 @@ class List:
 
     def make_key(self):
         data = self.load_list()
-
-        data["lists"][self.list_name] = {
-            
+        data["lists"][self.list_name+"."+self.color] = {
         }
-
         self.save_list(data)
 
     def add_task(self):
