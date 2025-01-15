@@ -3,18 +3,19 @@ import json
 from datetime import datetime
 from termcolor import colored
 
+FILE_NAME = "all_lists.json"
+
 class List:
 
     def __init__ (self, list_name, color):
-        self.file_name = "all_lists.json"
         self.list_name = list_name
         self.color = color
         self.initialize_list()
         self.make_key()
 
     def initialize_list (self):
-        if not os.path.exists(self.file_name):
-            with open(self.file_name, "w") as f:
+        if not os.path.exists(FILE_NAME):
+            with open(FILE_NAME, "w") as f:
                 json.dump({"lists": {}}, f, indent = 4)
 
     def make_key(self):
@@ -44,11 +45,11 @@ class List:
         self.save_list(data)
 
     def load_list(self):
-        with open(self.file_name, "r") as f:
+        with open(FILE_NAME, "r") as f:
             return json.load(f)
     
     def save_list(self, data):
-        with open(self.file_name, "w") as f:
+        with open(FILE_NAME, "w") as f:
                 json.dump(data, f, indent = 4)
     
     def print_tasks(self):
@@ -80,16 +81,6 @@ class List:
         
         return i
             
-
-    def remove_item(self, index):
-        data = self.load_list()
-        all_items = list(data["tasks"].keys())
-
-        key_to_remove = all_items[index-1]
-        del data["tasks"][key_to_remove]  # Remove the key-value pair
-        self.save_list(data)
-
-
 
 
     def getValidDate(self, prompt, date_format="%Y-%m-%d"):
@@ -144,6 +135,29 @@ def returnAllLists():
         with open("all_lists.json", "r") as f:
             data = json.load(f)
             return list(data["lists"].keys())
+        
+def remove_item(self, index):
+    data = self.load_list()
+    all_items = list(data["lists"].keys())
+
+    key_to_remove = all_items[index]
+    del data["lists"][key_to_remove]  # Remove the key-value pair
+    self.save_list(data)
+    
+
+def remove_list_array(all_names):
+    with open("all_lists.json", "r") as f:
+        data = json.load(f)
+
+        for name in all_names:
+            del data["lists"][name]
+    
+    with open(FILE_NAME, "w") as f:
+        json.dump(data, f, indent = 4)
+    
+    
+        
+
         
 
 

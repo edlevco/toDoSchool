@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 import list
+import functions
+
+
 
 # Initialize the main window
 window = tk.Tk()
@@ -14,13 +17,53 @@ window.geometry(f"{width}x{height}+{left}+{right}")
 window.bind("<Escape>", lambda e: window.quit())
 window.resizable(False, False)
 
-# Initialize variables
-mainWindow = True
-new_list_var = tk.StringVar()
-entry = None
-list_buttons = []  # To store button widgets for toggle
-check_vars = []  # To store variables for checkboxes
-edit_mode_active = False  # Flag for edit mode
+def del_list():
+
+    def check_stat():
+        remove_array = []
+        for i, var in enumerate(check_vars):
+            if var.get() == 1:
+                remove_array.append(fresh_list_names[i])
+        list.remove_list_array(remove_array)
+        dl_window.quit()
+        dl_window.destroy()
+                
+
+    fresh_list_names = list.returnAllLists() # Return
+    list_names = [name.split(".")[0] for name in fresh_list_names]
+    
+    
+    width = 250
+    height = 350
+    dl_window = tk.Toplevel()
+    dl_window.title("Delete list..")
+    dl_window.geometry(f"{width}x{height}")
+
+
+    check_vars = []
+
+    # Create Checkbuttons
+    for list_name in list_names:
+        check_var = tk.IntVar()  # Unique IntVar for each Checkbutton
+        check_vars.append(check_var)
+        check_box = tk.Checkbutton(
+            dl_window,
+            text=list_name,
+            variable=check_var  # Link IntVar to the Checkbutton
+        )
+        check_box.pack()
+
+    functions.create_cancel(height, dl_window)
+
+    del_btn = tk.Button(dl_window, text = "Create", command = check_stat)
+    del_btn.place(x = width - 10, y = height - 10, anchor="se")
+
+
+    dl_window.mainloop()
+
+    
+
+
 
 
 def new_list():
@@ -38,32 +81,24 @@ def new_list():
         )  # Create a new label with the updated color
         color_label.pack(pady=10)
 
-
-    def quit():
-        nl_window.quit()
-        label = tk.Label(nl_window, text = "Click to quit...", fg = "red")
-        label.place(x = 10, y = 298)
-
     def create_list():
         if preview.get() and preview:
             color = color_var.get()
             name = preview.get()
             new_list = list.List(name, color)
-
+            nl_window.quit()
+            nl_window.destroy()
 
     # List of colors
     colors = ["white", "red", "blue", "green", "dark orange", "purple", "dark gray", "goldenrod"]
-
+    width = 250
+    height = 350
     # Variables
     color_var = tk.StringVar(value=colors[0])  # Default selection
     preview = tk.StringVar()  # Initial preview text
 
 
-    # Create a new top-level window
-    nl_window = tk.Toplevel()  # Use Toplevel for a secondary window
-    nl_window.geometry("250x350")
-    nl_window.title("Create a New List")
-    nl_window.resizable(False, False)
+    nl_window = functions.create_window(width, height)
 
     # Add a label and entry for the name
     label = tk.Label(nl_window, text="Enter List Name:")
@@ -75,7 +110,6 @@ def new_list():
 
 # Create radio buttons for each color
     for color in colors:
-
         radio_btn = tk.Radiobutton(
             nl_window,
             text=color,  # Display the color name
@@ -86,15 +120,14 @@ def new_list():
         )
         radio_btn.pack()
     
-
+    
     color_label = tk.Label(nl_window, textvariable=preview, fg="white", font=("Helvetica", 25, "bold"))  # Default color
     color_label.pack(pady=10)
 
-    cancel_btn = tk.Button(nl_window, text = "Cancel", command = quit)
-    cancel_btn.place(x = 10, y = 320)
+    functions.create_cancel(height, nl_window)
 
-    cancel_btn = tk.Button(nl_window, text = "Create", command = create_list)
-    cancel_btn.place(x = 165, y = 320)
+    create_btn = tk.Button(nl_window, text = "Create", command = create_list)
+    create_btn.place(x = width - 10, y = height - 10, anchor="se")
 
     nl_window.mainloop()
 
@@ -104,21 +137,13 @@ mainMenu = tk.Menu(window)
 file_menu = tk.Menu(mainMenu, tearoff=False)
 file_menu.add_command(label="New List", command=new_list)
 file_menu.add_separator()
-file_menu.add_command(label="Delete List", command=lambda: print("delete list"))
-mainMenu.add_cascade(label="File", menu=file_menu)
+file_menu.add_command(label="Delete List", command=del_list)
+mainMenu.add_cascade(label="List", menu=file_menu)
 
 help_menu = tk.Menu(mainMenu, tearoff=False)
 mainMenu.add_cascade(label="Help", menu=help_menu)
 
 window.configure(menu=mainMenu)
-
-
-def print_entry():
-    """Add a new list."""
-    if new_list_var.get():  # Check if the value is not empty
-        btn = tk.Button(window, text=new_list_var.get())
-        btn.pack()
-        list_buttons.append(btn)
 
 
 # Run the main loop
