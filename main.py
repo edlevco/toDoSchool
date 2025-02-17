@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 import list
 import functions
 
@@ -15,9 +16,15 @@ input_font = ("Times New Roman", 17, "bold")
 
 list_labels = []  # Keep track of the list labels
 
+
+header = None
+
+
+
+
 # Configure row and column weights
-window.columnconfigure(0, weight=1, minsize=70)  # Column 0 expands proportionally
-window.columnconfigure(1, weight=3)  # Column 1 expands twice as much as column 0
+window.columnconfigure(0, weight=1, minsize=110)  # Column 0 expands proportionally
+window.columnconfigure(1, weight=3, minsize=180)  # Column 1 expands twice as much as column 0
 window.rowconfigure(0, weight=1)  # Row 0 expands
 
 def on_left_click(event):
@@ -51,6 +58,12 @@ def on_left_click(event):
 
 
 def show_tasks(label):
+
+    global header
+
+    if header is not None:
+        header.destroy()
+
     label.config(bg="black")
     button = tk.Button(
         task_frame,
@@ -59,22 +72,30 @@ def show_tasks(label):
     )
     button.place(x = 5, y = 5)
 
-    label.winfo_cget("fg")
+    color = label["fg"]
+    title = label["text"]
 
+    header = tk.Label(
+        task_frame,
+        text = title,
+        fg = color,
+        font = ("sans-serif", 20)
+    )
+    header.pack()
 
-
-    
-
-
-
-
-    
-
-    button.bind("<Button-1>", create_task)
+    button.bind("<Button-1>", lambda e: create_task())
 
 
 def create_task():
-    pass
+    nt_window = tk.Toplevel()
+    width = 500
+    height = 300
+    nt_window.geometry(f"{width}x{height}")
+    nt_window.title("Task Creation")
+    
+    ## name, date, drop down (school, end day), slider for completion, if 100 delete
+
+    nt_window.mainloop()
 
 
 def refresh_list_frame():
@@ -125,6 +146,7 @@ task_frame.grid(column=1, row=0, sticky="nesw")
 
 # Initial population of list_labels
 list_labels = refresh_list_frame()
+show_tasks(list_labels[0])
 
 window.bind("<Button-1>", on_left_click)
 window.bind("<Escape>", lambda e: window.quit())
@@ -136,6 +158,7 @@ def del_list():
         for i, var in enumerate(check_vars):
             if var.get() == 1:
                 remove_array.append(fresh_list_names[i])
+
         list.remove_list_array(remove_array)
 
         # Refresh the list after deletion
@@ -201,11 +224,14 @@ def new_list():
         if preview.get() and preview:
             color = color_var.get()
             name = preview.get()
-            new_list = list.List(name, color)
-            # Refresh the list after creation
-            refresh_list_frame()
-            nl_window.quit()
-            nl_window.destroy()
+            if len(preview.get()) > 15 and " " not in preview.get():
+                messagebox.showerror("Error", "List can't be more than 15 characters!")
+            else:
+                new_list = list.List(name, color)
+                # Refresh the list after creation
+                refresh_list_frame()
+                nl_window.quit()
+                nl_window.destroy()
 
     # List of colors
     colors = ["white", "red", "blue", "green", "dark orange", "purple", "dark gray", "goldenrod"]
