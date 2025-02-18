@@ -7,11 +7,17 @@ FILE_NAME = "all_lists.json"
 
 class List:
 
-    def __init__ (self, list_name, color):
+    def __init__ (self, list_name, color, new):
         self.list_name = list_name
         self.color = color
         self.initialize_list()
-        self.make_key()
+        if new:
+            self.make_key()
+
+    def return_tasks(self):
+        data = self.load_list()
+
+        return data["lists"][self.list_name+"."+self.color]
 
     def initialize_list (self):
         if not os.path.exists(FILE_NAME):
@@ -24,23 +30,13 @@ class List:
         }
         self.save_list(data)
 
-    def add_task(self):
+    def add_task(self, name, date, time, progress):
         data = self.load_list()
         
-        name = input("Enter task name: ")
-        description = input("Enter task description: ")
-        status = getValidInt("""
-                                (1) Not Started
-                                (2) In Progress
-
-""", 1, 2)
-
-        date = self.getValidDate("Enter tasks due date (yyyy-mm-dd): ")
-    
-        data["tasks"][self.list_name][name] = {
-            "description": description,
-            "status": status,
+        data["lists"][self.list_name+"."+self.color][name] = {
             "date": date,
+            "time": time,
+            "status": progress,
         }
         self.save_list(data)
 
@@ -52,28 +48,6 @@ class List:
         with open(FILE_NAME, "w") as f:
                 json.dump(data, f, indent = 4)
     
-    def print_tasks(self):
-        data = self.load_list()
-        names = list(data["lists"][self.list_name].keys())
-        print(f"List name: {self.list_name}")
-
-        # Mapping of status to messages and colors
-        status_map = {
-            1: ("un-started", "red"),
-            2: ("inprogress", "yellow")
-        }
-
-                # Iterate through the tasks
-        for key, task in data["tasks"].items():
-            print(f"Task: {key}")
-            print(f"Description: {task['description']}")
-            
-            # Get the status
-            task_status = task.get("status", 0)  # Default to 0 if "status" is missing
-            message, color = status_map.get(task_status, ("unknown", "white"))
-            print(colored(message, color))
-
-
     def print_all_names(self):
         data = self.load_list()
         for i, name in enumerate(data["tasks"][self.list_name].keys(), start = 1):
@@ -81,38 +55,6 @@ class List:
         
         return i
             
-
-
-    def getValidDate(self, prompt, date_format="%Y-%m-%d"):
-        while True:
-            try:
-                user_input = input(prompt)
-                valid_date = datetime.strptime(user_input, date_format)
-                
-                # Ensure the date is not in the past
-                if valid_date < datetime.now():
-                    print("The date cannot be in the past. Please enter a future date.")
-                    continue
-                
-                # Return the date as a string for JSON compatibility
-                return valid_date.strftime(date_format)
-            except ValueError:
-                print(f"Invalid date. Please enter in the format: {date_format}")
-
-    def createNewList(self):
-        data = self.load_list()
-        while True:
-            list_name = (input("Enter the name of the new list: ")).lower()
-
-            for name in data["lists"].keys():
-                if list_name == name:
-                    print(f"There is already a list with the name: {list_name}")
-                    return None
-            
-            return list_name
-    
-    
-    
 
     def getListName(index):
         json_files = [file.split(".")[0] for file in os.listdir("lists") if file.endswith('.json')]

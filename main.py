@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import list
 import functions
+from datetime import datetime
 
 # Initialize the main window
 window = tk.Tk()
@@ -83,17 +84,96 @@ def show_tasks(label):
     )
     header.pack()
 
-    button.bind("<Button-1>", lambda e: create_task())
+    button.bind("<Button-1>", lambda e: create_task(title))
+
+    for list_name in list.returnAllLists():
+        if list_name.split(".")[0].lower() == title.lower():
+            current_list = list.List(list_name.split(".")[0], list_name.split(".")[1], False)
+    tasks = current_list.return_tasks()
+
+    print(tasks)
 
 
-def create_task():
+
+
+
+
+def create_task(label):
+
+    def create_task():
+        create_task = True
+        try:
+            datetime.strptime(date_var.get(), "%m-%d")
+        except ValueError:
+            messagebox.showerror("Error", "Enter Valid Date")
+            create_task = False
+        
+        try: 
+            datetime.strptime(time_var.get(), "%H:%M")
+        except ValueError:
+            messagebox.showerror("Error", "Enter Valid 25Hr Time")
+            create_task = False
+
+        if create_task:
+
+            for title in list.returnAllLists():
+
+                if title.split(".")[0].lower() == label.lower():
+
+                    current = list.List(title.split(".")[0], title.split(".")[1], False)
+                    current.add_task(task_var.get(), date_var.get(), time_var.get(), dropdown_var.get())
+                    nt_window.quit()
+                    nt_window.destroy()
+
+                
+
+
     nt_window = tk.Toplevel()
     width = 500
     height = 300
     nt_window.geometry(f"{width}x{height}")
     nt_window.title("Task Creation")
+    nt_window.focus()
+
+    task_var = tk.StringVar()
+    task_entry = tk.Entry(
+        nt_window,
+        textvariable = task_var)
+    task_entry.pack()
+
+    date_var = tk.StringVar()
+    date_entry = tk.Entry(
+        nt_window,
+        textvariable = date_var
+    )
+    date_entry.pack()
+
+    time_var = tk.StringVar()
+    time_entry = tk.Entry(
+        nt_window,
+        textvariable = time_var
+    )
+    time_entry.pack()
+
     
-    ## name, date, drop down (school, end day), slider for completion, if 100 delete
+        # Create a Tkinter variable to hold the selected option
+    dropdown_var = tk.StringVar()
+    dropdown_var.set("Not Started")  # Set the default value
+
+    status = ["Not Started", "In Progress"]
+
+    # Create the dropdown menu (OptionMenu)
+    dropdown = tk.OptionMenu(nt_window, dropdown_var, *status)
+    dropdown.pack()
+
+
+
+
+
+    create_btn = tk.Button(nt_window, text="Create", command=create_task)
+    create_btn.place(x=width - 10, y=height - 10, anchor="se")
+
+    functions.create_cancel(height, nt_window)
 
     nt_window.mainloop()
 
@@ -151,6 +231,8 @@ show_tasks(list_labels[0])
 window.bind("<Button-1>", on_left_click)
 window.bind("<Escape>", lambda e: window.quit())
 window.resizable(False, False)
+
+
 
 def del_list():
     def check_stat():
@@ -227,7 +309,7 @@ def new_list():
             if len(preview.get()) > 15 and " " not in preview.get():
                 messagebox.showerror("Error", "List can't be more than 15 characters!")
             else:
-                new_list = list.List(name, color)
+                new_list = list.List(name.capitalize(), color, True)
                 # Refresh the list after creation
                 refresh_list_frame()
                 nl_window.quit()
