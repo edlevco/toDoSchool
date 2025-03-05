@@ -91,7 +91,7 @@ def show_tasks(label):
             current_list = list.List(list_name.split(".")[0], list_name.split(".")[1], False)
     tasks = current_list.return_tasks()
 
-    print(tasks)
+    print(tasks.keys())
 
 
 
