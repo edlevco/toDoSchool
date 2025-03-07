@@ -19,6 +19,7 @@ list_labels = []  # Keep track of the list labels
 
 
 header = None
+item_frame = None
 
 
 
@@ -60,10 +61,15 @@ def on_left_click(event):
 
 def show_tasks(label):
 
+
     global header
+    global item_frame
 
     if header is not None:
         header.destroy()
+    
+    if item_frame is not None:
+        item_frame.destroy()
 
     label.config(bg="black")
     button = tk.Button(
@@ -91,7 +97,22 @@ def show_tasks(label):
             current_list = list.List(list_name.split(".")[0], list_name.split(".")[1], False)
     tasks = current_list.return_tasks()
 
-    print(tasks.keys())
+    # Create a Frame that will expand to fill the space
+    item_frame = tk.Frame(task_frame, bd=5, relief="solid", highlightbackground="blue", highlightcolor="blue")
+    item_frame.pack(fill="both", expand=True)
+
+
+    for task_key, task_data in tasks.items():
+        label = tk.Label(
+            item_frame,
+            text = task_key
+        )
+        label.pack()
+        
+        
+        
+        
+
 
 
 
